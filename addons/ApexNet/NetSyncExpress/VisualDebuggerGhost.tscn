@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://visual_debugger_ghost"]
+
+[ext_resource type="Script" path="res://addons/ApexNet/NetSyncExpress/VisualDebuggerGhost.gd" id="1_ghost"]
+
+[node name="VisualDebuggerGhost" type="Node3D"]
+script = ExtResource("1_ghost")

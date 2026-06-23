@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://gfbxqldr045c"]
+
+[ext_resource type="Shader" uid="uid://cqe5j4aqgwpp6" path="res://Demo/Scene/Materials/prototype_grid.gdshader" id="1_qbkki"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_qbkki")
+shader_parameter/base_color = Color(0.3, 0.3, 0.3, 1)
+shader_parameter/line_color = Color(0, 0, 0, 0.35)
+shader_parameter/grid_size = 1.0
+shader_parameter/line_width = 0.03

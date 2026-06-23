@@ -1,0 +1,31 @@
+# Godot 4+ specific ignores
+.godot/
+*.tmp
+*.import.bak
+
+# Export binaries
+export/
+builds/
+*.exe
+*.apk
+*.aab
+*.ipa
+*.dmg
+*.app
+
+# Android
+/android/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Godot export presets (keep template, ignore user overrides)
+export_presets.cfg.user

@@ -1,0 +1,119 @@
+[gd_scene format=3 uid="uid://c4bv2qlqh8r0f"]
+
+[ext_resource type="Script" uid="uid://ctgqoqi5f5v57" path="res://Demo/Player/SpawnPoint.gd" id="1_gsl5x"]
+[ext_resource type="Material" uid="uid://gfbxqldr045c" path="res://Demo/Scene/Materials/Ground.tres" id="1_o0y4p"]
+[ext_resource type="Material" uid="uid://bpvrxw7n8y7pi" path="res://Demo/Scene/Materials/Wall.tres" id="2_3wn6j"]
+[ext_resource type="Script" uid="uid://bxehn5v2xfx1r" path="res://Demo/UI/NetworkUI.gd" id="2_wbk7q"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_wbk7q"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_w2n5c"]
+sky_material = SubResource("ProceduralSkyMaterial_wbk7q")
+
+[sub_resource type="Environment" id="Environment_o0y4p"]
+background_mode = 2
+sky = SubResource("Sky_w2n5c")
+glow_enabled = true
+
+[node name="PlayGround" type="Node3D" unique_id=1539219592]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1618535644]
+environment = SubResource("Environment_o0y4p")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2115865840]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Level" type="Node3D" parent="." unique_id=1257006431]
+
+[node name="Plane" type="CSGBox3D" parent="Level" unique_id=1313837243]
+use_collision = true
+size = Vector3(30, 0.5, 30)
+material = ExtResource("1_o0y4p")
+
+[node name="Wall" type="CSGBox3D" parent="Level" unique_id=1032569425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.298325e-06, 1.7799, 15.050301)
+autosmooth = true
+use_collision = true
+size = Vector3(30, 3.5477295, 0.10058594)
+material = ExtResource("2_3wn6j")
+
+[node name="Wall2" type="CSGBox3D" parent="Level" unique_id=1098018410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.298325e-06, 1.7799, -14.949699)
+autosmooth = true
+use_collision = true
+size = Vector3(30, 3.5477295, 0.10058594)
+material = ExtResource("2_3wn6j")
+
+[node name="Wall3" type="CSGBox3D" parent="Level" unique_id=551960084]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 15.05031, 1.7799, 0.10060024)
+autosmooth = true
+use_collision = true
+size = Vector3(30, 3.5477295, 0.10058594)
+material = ExtResource("2_3wn6j")
+
+[node name="Wall4" type="CSGBox3D" parent="Level" unique_id=617632514]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -14.94969, 1.7799, 0.10060024)
+autosmooth = true
+use_collision = true
+size = Vector3(30, 3.5477295, 0.10058594)
+material = ExtResource("2_3wn6j")
+
+[node name="Spawn1" type="Marker3D" parent="." unique_id=1587037005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.5, 4)
+script = ExtResource("1_gsl5x")
+
+[node name="Spawn2" type="Marker3D" parent="." unique_id=1812716919]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.5, 4)
+script = ExtResource("1_gsl5x")
+
+[node name="Spawn3" type="Marker3D" parent="." unique_id=1383160408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.5, -4)
+script = ExtResource("1_gsl5x")
+
+[node name="Spawn4" type="Marker3D" parent="." unique_id=883168295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.5, -4)
+script = ExtResource("1_gsl5x")
+
+[node name="NetworkUI" type="CanvasLayer" parent="." unique_id=261547420]
+script = ExtResource("2_wbk7q")
+
+[node name="Background" type="ColorRect" parent="NetworkUI" unique_id=531242857]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 1)
+
+[node name="Center" type="CenterContainer" parent="NetworkUI/Background" unique_id=292666274]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MenuContainer" type="VBoxContainer" parent="NetworkUI/Background/Center" unique_id=1420713451]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="NetworkUI/Background/Center/MenuContainer" unique_id=868782088]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "NetSyncExpress"
+horizontal_alignment = 1
+
+[node name="HostBtn" type="Button" parent="NetworkUI/Background/Center/MenuContainer" unique_id=377960635]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Start as Server (Host)"
+
+[node name="JoinBtn" type="Button" parent="NetworkUI/Background/Center/MenuContainer" unique_id=1771625114]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Start as Client"
+
+[node name="StatusLabel" type="Label" parent="NetworkUI/Background/Center/MenuContainer" unique_id=90129639]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
