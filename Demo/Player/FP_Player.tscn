@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://c2atg2cwhl0"]
 
-[ext_resource type="Script" uid="uid://c8ueyqwo8obm5" path="res://Demo/Player/Player.gd" id="1_q7osf"]
-[ext_resource type="Script" uid="uid://e1rmo3k0383l" path="res://addons/ApexNet/NetSyncExpress/NetworkedMovementComponent.gd" id="2_gcvkd"]
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ummbm"]
+[ext_resource type="Script" uid="uid://civaovssrc3fc" path="res://Demo/Player/Player.gd" id="1_q7osf"]
+[ext_resource type="Script" uid="uid://bbird8dqw446u" path="res://addons/ApexNet/NetSyncExpress/NetworkedMovementComponent.gd" id="2_gcvkd"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ummbm"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ummbm"]
 
 [node name="FpPlayer" type="CharacterBody3D" unique_id=1575706894]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -16,13 +16,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 
 [node name="Camera3D" type="Camera3D" parent="CamHolder" unique_id=1853253118]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=531536140]
-shape = SubResource("CapsuleShape3D_ummbm")
-
 [node name="Body" type="MeshInstance3D" parent="." unique_id=2123547727]
 mesh = SubResource("CapsuleMesh_ummbm")
 
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1494478028]
+shape = SubResource("CapsuleShape3D_ummbm")
+
 [node name="NetworkedMovementComponent" type="Node" parent="." unique_id=1428325352]
 script = ExtResource("2_gcvkd")
-enable_visual_debugger = null
-metadata/_custom_type_script = "uid://e1rmo3k0383l"
+debug_print = null

@@ -5,17 +5,40 @@ const PORT := 25565
 const MAX_PLAYERS := 4
 const PLAYER_SCENE := preload("res://Demo/Player/FP_Player.tscn")
 
-@export var simulated_latency_ms: float = 0.0
+var _simulated_latency_ms: float = 0.0
+@export var simulated_latency_ms: float:
+	get():
+		return _simulated_latency_ms
+	set(value):
+		_simulated_latency_ms = value
+		# Bump generation to cancel any pending delayed RPCs from the old latency.
+		# Without this, switching from 200ms → 0ms leaves stale timer callbacks
+		# that deliver out-of-order inputs to the server long after the switch.
+		_latency_gen += 1
 
 var players: Dictionary = {}  # peer_id -> Player node
+var _player_spawn_indices: Dictionary = {}  # peer_id -> spawn index
+var _next_spawn_index: int = 0
+var _latency_gen: int = 0
 
 
 signal player_spawned(peer_id: int, player: Node)
 signal player_despawned(peer_id: int)
 
 
+func _pick_spawn_index() -> int:
+	var spawns: Array[Node] = get_tree().get_nodes_in_group(&"spawn_points")
+	var idx := _next_spawn_index % maxi(spawns.size(), 1)
+	_next_spawn_index += 1
+	return idx
+
+
+func _get_player_spawn_index(peer_id: int) -> int:
+	return _player_spawn_indices.get(peer_id, _pick_spawn_index())
+
+
 func get_simulated_latency() -> float:
-	return simulated_latency_ms / 1000.0
+	return _simulated_latency_ms / 1000.0
 
 
 func send_with_latency(target: Callable, args: Array = []) -> void:
@@ -23,8 +46,14 @@ func send_with_latency(target: Callable, args: Array = []) -> void:
 	if delay <= 0.0:
 		target.callv(args)
 	else:
+		var gen := _latency_gen
 		get_tree().create_timer(delay).timeout.connect(
-			func() -> void: target.callv(args),
+			func() -> void:
+				# If latency was changed since this timer was created, the RPC
+				# is stale — it would deliver an old input out of order. Drop it.
+				if _latency_gen != gen:
+					return
+				target.callv(args),
 			CONNECT_ONE_SHOT,
 		)
 
@@ -44,7 +73,8 @@ func host_game() -> void:
 
 
 func _call_spawn() -> void:
-	_spawn_player.rpc(multiplayer.get_unique_id())
+	var spawn_index := _pick_spawn_index()
+	_spawn_player.rpc(multiplayer.get_unique_id(), spawn_index)
 
 
 func join_game(address: String) -> bool:
@@ -82,11 +112,12 @@ func _on_peer_connected(peer_id: int) -> void:
 	for id in players.keys():
 		existing_ids.append(id as int)
 
-	_spawn_player.rpc(peer_id)
+	var spawn_index := _pick_spawn_index()
+	_spawn_player.rpc(peer_id, spawn_index)
 
 	for existing_id in existing_ids:
 		if existing_id != peer_id:
-			_spawn_player.rpc_id(peer_id, existing_id)
+			_spawn_player.rpc_id(peer_id, existing_id, _get_player_spawn_index(existing_id))
 
 
 func _on_peer_disconnected(peer_id: int) -> void:
@@ -97,7 +128,7 @@ func _on_peer_disconnected(peer_id: int) -> void:
 
 
 @rpc(&"authority", &"call_local", &"reliable")
-func _spawn_player(peer_id: int) -> void:
+func _spawn_player(peer_id: int, spawn_index: int) -> void:
 	if not is_inside_tree():
 		return
 
@@ -110,7 +141,7 @@ func _spawn_player(peer_id: int) -> void:
 		return
 
 	var spawns: Array[Node] = get_tree().get_nodes_in_group(&"spawn_points")
-	var spawn: Node3D = spawns.pick_random() as Node3D if spawns.size() > 0 else null
+	var spawn: Node3D = spawns[spawn_index] as Node3D if spawn_index >= 0 and spawn_index < spawns.size() else null
 
 	var player: Node = PLAYER_SCENE.instantiate()
 	player.name = player_name
@@ -125,4 +156,5 @@ func _spawn_player(peer_id: int) -> void:
 			body.global_rotation = spawn.global_rotation
 
 	players[peer_id] = player
+	_player_spawn_indices[peer_id] = spawn_index
 	player_spawned.emit(peer_id, player)

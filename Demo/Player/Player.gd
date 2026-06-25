@@ -109,6 +109,15 @@ func _process(delta: float) -> void:
 
 	_dash_cooldown_timer = maxf(_dash_cooldown_timer - delta, 0.0)
 
+	if Input.is_action_just_pressed(&"latency_1"):
+		_set_simulated_latency(100.0)
+	elif Input.is_action_just_pressed(&"latency_2"):
+		_set_simulated_latency(150.0)
+	elif Input.is_action_just_pressed(&"latency_3"):
+		_set_simulated_latency(200.0)
+	elif Input.is_action_just_pressed(&"latency_4"):
+		_set_simulated_latency(0.0)
+
 	if headbob_enabled and _cam_holder:
 		_update_headbob(delta)
 
@@ -121,7 +130,7 @@ func _physics_process(delta: float) -> void:
 		_movement_component.process_tick(delta)
 	elif is_multiplayer_authority():
 		var snap := get_input_snapshot(0)
-		apply_movement(snap, delta)
+		apply_net_movement(snap, delta)
 
 
 # -------------------------------------------------------------------------- #
@@ -143,7 +152,7 @@ func get_input_snapshot(tick: int) -> InputSnapshot:
 # -------------------------------------------------------------------------- #
 #  Movement interface  (called by NetworkedMovementComponent)
 # -------------------------------------------------------------------------- #
-func apply_movement(snap: InputSnapshot, _delta: float) -> void:
+func apply_net_movement(snap: InputSnapshot, _delta: float) -> void:
 	rotation.y = snap.camera_yaw
 	if _cam_holder:
 		_cam_holder.rotation.x = snap.camera_pitch
@@ -216,6 +225,13 @@ func apply_movement(snap: InputSnapshot, _delta: float) -> void:
 
 
 # -------------------------------------------------------------------------- #
+#  Network state reset  (called by NetworkedMovementComponent on hard snap)
+# -------------------------------------------------------------------------- #
+func reset_net_state() -> void:
+	_dash_cooldown_timer = 0.0
+
+
+# -------------------------------------------------------------------------- #
 #  Headbob
 # -------------------------------------------------------------------------- #
 func _update_headbob(delta: float) -> void:
@@ -231,3 +247,9 @@ func _update_headbob(delta: float) -> void:
 			_headbob_rest,
 			delta * headbob_frequency * 5.0,
 		)
+
+
+func _set_simulated_latency(ms: float) -> void:
+	var gm := get_node_or_null("/root/GameManager")
+	if gm:
+		gm.simulated_latency_ms = ms
